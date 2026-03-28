@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>IPL 2026 — Live Countdown</title>
+<meta name="description" content="IPL 2026 full schedule, live countdown, team filters & points table"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════
+   ROOT & THEME
+═══════════════════════════════════════ */
+:root{
+  --gold:#F5A623;--gold2:#FFD166;--gold3:#FFF0C0;
+  --live:#FF3B5C;--green:#06D6A0;
+  --bg:#080810;--bg2:#0E0E1C;--bg3:#13132A;
+  --card:rgba(255,255,255,.038);--card-h:rgba(255,255,255,.07);
+  --glass:rgba(255,255,255,.06);--glass-border:rgba(255,255,255,.1);
+  --border:rgba(255,255,255,.07);--border-gold:rgba(245,166,35,.25);
+  --text:#F0F0FA;--sub:#9090B8;--muted:#50507A;
+  --radius:16px;--radius-sm:10px;
+  --shadow:0 20px 60px rgba(0,0,0,.5);
+  --transition:.22s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="light"]{
+  --bg:#F0F0F8;--bg2:#E4E4F0;--bg3:#D8D8EC;
+  --card:rgba(255,255,255,.7);--card-h:rgba(255,255,255,.9);
+  --glass:rgba(255,255,255,.5);--glass-border:rgba(0,0,0,.08);
+  --border:rgba(0,0,0,.08);--border-gold:rgba(245,166,35,.35);
+  --text:#0A0A1A;--sub:#404060;--muted:#8080A0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;
+  min-height:100vh;overflow-x:hidden;transition:background var(--transition),color var(--transition)}
+
+/* ═══════════════════════════════════════
+   AMBIENT BACKGROUND
+═══════════════════════════════════════ */
+.amb{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.amb-g1{position:absolute;top:-20%;left:50%;transform:translateX(-50%);
+  width:900px;height:500px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(245,166,35,.13) 0%,transparent 70%);
+  animation:drift 12s ease-in-out infinite alternate}
+.amb-g2{position:absolute;bottom:-10%;right:-10%;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,59,92,.06) 0%,transparent 70%);
+  animation:drift2 15s ease-in-out infinite alternate}
+.amb-g3{position:absolute;top:40%;left:-10%;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(6,214,160,.05) 0%,transparent 70%);
+  animation:drift 18s ease-in-out infinite alternate-reverse}
+/* cricket field rings */
+.amb-ring{position:absolute;top:-100px;right:-100px;width:600px;height:600px;border-radius:50%;
+  border:1px solid rgba(245,166,35,.07);
+  box-shadow:0 0 0 80px rgba(245,166,35,.04),0 0 0 160px rgba(245,166,35,.025),0 0 0 240px rgba(245,166,35,.01)}
+@keyframes drift{0%{transform:translateX(-50%) scale(1)}100%{transform:translateX(-45%) scale(1.1)}}
+@keyframes drift2{0%{transform:scale(1)}100%{transform:scale(1.15) translate(-3%,-3%)}}
+
+/* ═══════════════════════════════════════
+   CREDIT BAR
+═══════════════════════════════════════ */
+.credit-bar{position:relative;z-index:20;background:rgba(245,166,35,.08);
+  border-bottom:1px solid var(--border-gold);text-align:center;padding:8px 1rem;
+  font-size:.78rem;color:var(--muted);letter-spacing:.3px}
+.credit-bar a{color:var(--gold);text-decoration:none;font-weight:700;transition:opacity .2s}
+.credit-bar a:hover{opacity:.7}
+.heart{display:inline-block;animation:heartbeat .9s ease infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+header{position:sticky;top:0;z-index:100;
+  background:rgba(8,8,16,.85);backdrop-filter:blur(28px) saturate(180%);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;height:60px;transition:background var(--transition)}
+[data-theme="light"] header{background:rgba(240,240,248,.88)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.85rem;letter-spacing:4px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:default}
+.hcontrols{display:flex;align-items:center;gap:.6rem}
+.live-pill{display:none;align-items:center;gap:5px;
+  background:rgba(255,59,92,.12);border:1px solid rgba(255,59,92,.3);
+  border-radius:20px;padding:4px 11px;font-size:.65rem;font-weight:700;
+  letter-spacing:1.5px;color:var(--live);text-transform:uppercase}
+.ldot{width:6px;height:6px;background:var(--live);border-radius:50%;
+  animation:ldot 1.3s ease infinite}
+@keyframes ldot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.5)}}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
+  background:var(--card);color:var(--text);font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+.theme-btn:hover{background:var(--card-h);border-color:var(--border-gold)}
+
+/* ═══════════════════════════════════════
+   NAV TABS
+═══════════════════════════════════════ */
+.nav-tabs{position:sticky;top:60px;z-index:90;
+  background:rgba(8,8,16,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;gap:.3rem;padding:.5rem 1rem}
+[data-theme="light"] .nav-tabs{background:rgba(240,240,248,.88)}
+.ntab{font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;padding:7px 18px;border-radius:30px;
+  border:1px solid transparent;background:transparent;color:var(--muted);
+  cursor:pointer;transition:all var(--transition)}
+.ntab:hover{color:var(--text);border-color:var(--border)}
+.ntab.active{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* ═══════════════════════════════════════
+   PAGE SECTIONS
+═══════════════════════════════════════ */
+.page{display:none;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero{text-align:center;padding:4rem 1rem 2rem;position:relative;z-index:1}
+.hero-badge{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gold);background:rgba(245,166,35,.1);
+  border:1px solid var(--border-gold);border-radius:20px;padding:5px 16px;margin-bottom:1.2rem}
+
+/* Animated cricket ball */
+.ball-wrap{display:flex;justify-content:center;margin-bottom:1rem}
+.cricket-ball{width:56px;height:56px;position:relative;animation:ballbounce 1.8s cubic-bezier(.36,.07,.19,.97) infinite}
+@keyframes ballbounce{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  30%{transform:translateY(-22px) rotate(120deg)}
+  60%{transform:translateY(-8px) rotate(200deg)}
+}
+.cricket-ball svg{width:100%;height:100%;filter:drop-shadow(0 6px 20px rgba(245,166,35,.4))}
+
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,14vw,9rem);
+  letter-spacing:4px;line-height:.9;
+  background:linear-gradient(170deg,#fff 5%,var(--gold2) 45%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{margin-top:.8rem;font-size:.8rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+
+/* Day counter */
+.day-counter{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.2rem;
+  background:var(--glass);border:1px solid var(--glass-border);border-radius:30px;
+  padding:8px 20px;font-size:.8rem;font-weight:600;color:var(--sub);
+  backdrop-filter:blur(10px)}
+.day-counter span{color:var(--gold);font-weight:700;font-size:1rem}
+
+/* ═══════════════════════════════════════
+   TEAM FILTER CHIPS
+═══════════════════════════════════════ */
+.team-filter{position:relative;z-index:1;padding:1.2rem 1rem .5rem;
+  display:flex;justify-content:center;gap:.4rem;flex-wrap:wrap}
+.tc{display:flex;align-items:center;gap:5px;padding:5px 14px 5px 8px;
+  border-radius:30px;border:1px solid var(--border);background:var(--card);
+  cursor:pointer;transition:all var(--transition);font-size:.75rem;font-weight:600;
+  color:var(--sub);letter-spacing:.5px}
+.tc:hover{border-color:var(--border-gold);color:var(--text)}
+.tc.active{color:#000;border-color:transparent}
+.tc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tc-all{background:var(--glass);border-color:var(--glass-border);color:var(--sub)}
+.tc-all.active{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* ═══════════════════════════════════════
+   STATUS FILTERS
+═══════════════════════════════════════ */
+.status-filter{position:relative;z-index:1;display:flex;justify-content:center;
+  gap:.4rem;flex-wrap:wrap;padding:.6rem 1rem 1.5rem}
+.sf{font-size:.7rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  padding:6px 16px;border-radius:30px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;transition:all var(--transition)}
+.sf:hover{border-color:var(--border-gold);color:var(--gold)}
+.sf.active{background:var(--gold);border-color:var(--gold);color:#000}
+
+/* ═══════════════════════════════════════
+   NEXT MATCH HERO CARD
+═══════════════════════════════════════ */
+.next-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto 2.5rem;padding:0 1rem}
+.next-card{
+  background:linear-gradient(135deg,rgba(245,166,35,.09),rgba(255,107,0,.05) 50%,rgba(15,8,50,.5));
+  border:1px solid var(--border-gold);border-radius:24px;padding:2.5rem 1.8rem 2rem;
+  position:relative;overflow:hidden;
+  box-shadow:0 0 80px rgba(245,166,35,.08),var(--shadow)}
+[data-theme="light"] .next-card{background:linear-gradient(135deg,rgba(245,166,35,.12),rgba(255,255,255,.8))}
+.nc-label{position:absolute;top:1.1rem;left:50%;transform:translateX(-50%);
+  font-size:.58rem;letter-spacing:4px;color:var(--gold);font-weight:700;text-transform:uppercase;opacity:.7}
+.nc-glow{position:absolute;top:-60px;right:-60px;width:250px;height:250px;
+  background:radial-gradient(circle,rgba(245,166,35,.15) 0%,transparent 70%);pointer-events:none}
+.nc-glow2{position:absolute;bottom:-70px;left:-50px;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(255,59,92,.08) 0%,transparent 70%);pointer-events:none}
+
+.match-teams{display:flex;align-items:center;justify-content:center;gap:1.5rem;
+  margin:1.8rem 0 1rem;flex-wrap:wrap}
+.tblock{display:flex;flex-direction:column;align-items:center;gap:.5rem;min-width:100px}
+.tlogo{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;
+  border:2px solid rgba(255,255,255,.12);box-shadow:0 6px 24px rgba(0,0,0,.4);
+  transition:transform .3s,box-shadow .3s;cursor:default}
+.tlogo:hover{transform:scale(1.1);box-shadow:0 10px 32px rgba(0,0,0,.5)}
+.tname-big{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;text-align:center}
+.vs-text{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:rgba(245,166,35,.4);flex-shrink:0}
+.next-meta{text-align:center;font-size:.78rem;color:var(--sub);margin-bottom:1.8rem;line-height:2}
+.next-meta strong{color:var(--gold);font-weight:600}
+
+/* COUNTDOWN */
+.cd-row{display:flex;justify-content:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.cdb{display:flex;flex-direction:column;align-items:center;
+  background:rgba(0,0,0,.3);border:1px solid rgba(245,166,35,.18);
+  border-radius:14px;padding:.9rem 1.1rem;min-width:68px;
+  box-shadow:0 4px 16px rgba(0,0,0,.3)}
+[data-theme="light"] .cdb{background:rgba(255,255,255,.6);border-color:rgba(245,166,35,.3)}
+.cdn{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;line-height:1;
+  background:linear-gradient(180deg,#fff 20%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+[data-theme="light"] .cdn{background:linear-gradient(180deg,#222 20%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cdl{font-size:.55rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);margin-top:.15rem}
+
+/* next card actions */
+.nc-actions{display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap}
+.nc-btn{display:flex;align-items:center;gap:5px;padding:7px 16px;border-radius:30px;
+  border:1px solid var(--border);background:var(--card);color:var(--sub);
+  font-size:.72rem;font-weight:600;cursor:pointer;transition:all var(--transition);
+  font-family:'Outfit',sans-serif}
+.nc-btn:hover{border-color:var(--border-gold);color:var(--gold);background:var(--card-h)}
+
+/* ═══════════════════════════════════════
+   SCHEDULE
+═══════════════════════════════════════ */
+.sched{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 1rem 5rem}
+.sched-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;
+  color:var(--gold);margin-bottom:1.4rem;padding-bottom:.5rem;border-bottom:1px solid var(--border-gold)}
+.month-g{margin-bottom:2.5rem}
+.month-lbl{font-size:.62rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.7rem;display:flex;align-items:center;gap:.6rem}
+.month-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* MATCH CARD */
+.mc{
+  background:var(--card);
+  backdrop-filter:blur(12px);
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem 1.3rem;
+  display:grid;grid-template-columns:76px 1fr auto;
+  align-items:center;gap:.9rem;margin-bottom:.5rem;
+  position:relative;overflow:hidden;
+  transition:background var(--transition),border-color var(--transition),transform var(--transition),box-shadow var(--transition);
+  opacity:0;animation:fadeUp .35s ease forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.mc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:4px 0 0 4px;background:transparent;transition:background var(--transition)}
+.mc:hover{background:var(--card-h);border-color:var(--border-gold);
+  transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.mc:hover::before{background:var(--gold)}
+.mc.is-live{border-color:rgba(255,59,92,.35);background:rgba(255,59,92,.05)}
+.mc.is-live::before{background:var(--live)}
+.mc.is-past{opacity:.35!important}
+.mc.is-past:hover{transform:none;box-shadow:none;border-color:var(--border)}
+/* stagger */
+.mc:nth-child(1){animation-delay:.03s}.mc:nth-child(2){animation-delay:.06s}
+.mc:nth-child(3){animation-delay:.09s}.mc:nth-child(4){animation-delay:.12s}
+.mc:nth-child(5){animation-delay:.15s}.mc:nth-child(6){animation-delay:.18s}
+.mc:nth-child(7){animation-delay:.21s}.mc:nth-child(8){animation-delay:.24s}
+.mc:nth-child(9){animation-delay:.27s}.mc:nth-child(10){animation-delay:.30s}
+
+.mc-date{text-align:center;border-right:1px solid var(--border);padding-right:.9rem}
+.mc-day-n{font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;color:var(--text)}
+.mc-day-s{font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.mc-time{font-size:.7rem;color:var(--gold);font-weight:600;margin-top:2px}
+
+.mc-info{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mc-teams{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1.5px;
+  display:flex;align-items:center;gap:.45rem;flex-wrap:wrap}
+.tdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;display:inline-block}
+.mc-vs{color:var(--muted);font-size:.85rem}
+.mc-venue{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-num{font-size:.62rem;color:var(--muted);font-weight:500;opacity:.7}
+
+.mc-right{display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;min-width:80px}
+.cdm{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gold);
+  white-space:nowrap;letter-spacing:.5px}
+.cdml{font-size:.56rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.b-live{background:var(--live);color:#fff;font-size:.55rem;font-weight:700;letter-spacing:1px;
+  padding:3px 8px;border-radius:8px;text-transform:uppercase;animation:lp 1.4s ease infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.5}}
+.b-done{font-size:.68rem;color:var(--muted)}
+
+/* match action btns */
+.mc-actions{display:flex;gap:.3rem;margin-top:.1rem}
+.mab{width:26px;height:26px;border-radius:8px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);font-size:.75rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all var(--transition)}
+.mab:hover{border-color:var(--border-gold);color:var(--gold);background:var(--card-h)}
+
+/* ═══════════════════════════════════════
+   POINTS TABLE
+═══════════════════════════════════════ */
+.pts-wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:2rem 1rem 5rem}
+.pts-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;
+  color:var(--gold);margin-bottom:.5rem}
+.pts-note{font-size:.72rem;color:var(--muted);margin-bottom:1.5rem}
+.pts-table{width:100%;border-collapse:collapse;border-radius:var(--radius);overflow:hidden}
+.pts-table th{background:rgba(245,166,35,.12);color:var(--gold);font-size:.68rem;
+  font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:.7rem .8rem;text-align:left}
+.pts-table th:not(:first-child){text-align:center}
+.pts-table td{padding:.75rem .8rem;font-size:.82rem;border-bottom:1px solid var(--border);
+  text-align:center;vertical-align:middle}
+.pts-table td:first-child{text-align:left}
+.pts-table tr:last-child td{border-bottom:none}
+.pts-table tbody tr{background:var(--card);transition:background var(--transition)}
+.pts-table tbody tr:hover{background:var(--card-h)}
+.pts-table tbody tr.playoff-zone td:first-child{border-left:3px solid var(--green)}
+.team-cell{display:flex;align-items:center;gap:.6rem}
+.tc-logo{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.5px;flex-shrink:0}
+.team-full{font-weight:600;font-size:.8rem}
+.team-abbr{font-size:.65rem;color:var(--muted)}
+.pts-badge{display:inline-block;background:var(--border-gold);color:var(--gold);
+  font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:4px}
+
+/* ═══════════════════════════════════════
+   VENUES
+═══════════════════════════════════════ */
+.venues-wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:2rem 1rem 5rem}
+.venues-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;color:var(--gold);margin-bottom:1.5rem}
+.venues-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.8rem}
+.vc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.2rem;transition:all var(--transition);cursor:default}
+.vc:hover{background:var(--card-h);border-color:var(--border-gold);transform:translateY(-2px)}
+.vc-icon{font-size:2rem;margin-bottom:.5rem}
+.vc-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--text);margin-bottom:.2rem}
+.vc-city{font-size:.75rem;color:var(--gold);font-weight:600;margin-bottom:.4rem}
+.vc-cap{font-size:.72rem;color:var(--muted)}
+.vc-matches{margin-top:.6rem;font-size:.68rem;color:var(--muted);
+  background:var(--bg3);border-radius:6px;padding:4px 8px;display:inline-block}
+
+/* ═══════════════════════════════════════
+   CONFETTI CANVAS
+═══════════════════════════════════════ */
+#confetti{position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:999;display:none}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--bg3);border:1px solid var(--border-gold);border-radius:30px;
+  padding:10px 22px;font-size:.78rem;color:var(--text);z-index:500;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;
+  box-shadow:var(--shadow)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════════════════════
+   SCROLL TO TOP
+═══════════════════════════════════════ */
+.scroll-top{position:fixed;bottom:1.5rem;right:1.5rem;width:40px;height:40px;
+  border-radius:50%;background:var(--gold);color:#000;border:none;
+  font-size:1.1rem;cursor:pointer;z-index:200;
+  box-shadow:0 4px 16px rgba(245,166,35,.4);
+  opacity:0;transition:opacity .3s,transform .3s;transform:translateY(10px)}
+.scroll-top.show{opacity:1;transform:translateY(0)}
+
+/* empty state */
+.empty{text-align:center;color:var(--muted);padding:3rem;font-size:.9rem}
+
+/* responsive */
+@media(max-width:580px){
+  .mc{grid-template-columns:62px 1fr}
+  .mc-right{display:none}
+  .match-teams{gap:1rem}
+  .tlogo{width:56px;height:56px}
+  .hero h1{font-size:clamp(3rem,16vw,5rem)}
+  header{padding:0 1rem}
+  .nav-tabs{gap:.2rem;padding:.4rem .5rem}
+  .ntab{padding:6px 12px;font-size:.68rem}
+}
+</style>
+</head>
+<body>
+<div class="amb">
+  <div class="amb-g1"></div><div class="amb-g2"></div>
+  <div class="amb-g3"></div><div class="amb-ring"></div>
+</div>
+<canvas id="confetti"></canvas>
+
+<!-- CREDIT -->
+<div class="credit-bar">
+  Made with <span class="heart">🩷</span> by
+  <a href="https://www.instagram.com/bettercallvrd?igsh=MWI0dm0xcDI4ZzVueA==" target="_blank" rel="noopener">@bettercallvrd</a>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">IPL 2026</div>
+  <div class="hcontrols">
+    <div class="live-pill" id="livePill"><span class="ldot"></span><span id="liveText">LIVE</span></div>
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-tabs">
+  <button class="ntab active" data-page="schedule">📅 Schedule</button>
+  <button class="ntab" data-page="points">📊 Points Table</button>
+  <button class="ntab" data-page="venues">🏟️ Venues</button>
+</nav>
+
+<!-- ══ PAGE: SCHEDULE ══ -->
+<div class="page active" id="page-schedule">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">🏆 TATA IPL 2026 · Season 19</div>
+    <div class="ball-wrap">
+      <div class="cricket-ball">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="48" fill="#C0392B"/>
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#8B0000" stroke-width="2"/>
+          <!-- seam -->
+          <path d="M50 2 Q70 25 70 50 Q70 75 50 98" fill="none" stroke="#F5E642" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M50 2 Q30 25 30 50 Q30 75 50 98" fill="none" stroke="#F5E642" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- seam stitches -->
+          <path d="M58 15 L62 20 M60 25 L65 28 M61 35 L66 37 M61 50 L66 50 M61 63 L66 65 M60 73 L65 76 M58 83 L62 87" stroke="#F5E642" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M42 15 L38 20 M40 25 L35 28 M39 35 L34 37 M39 50 L34 50 M39 63 L34 65 M40 73 L35 76 M42 83 L38 87" stroke="#F5E642" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- shine -->
+          <ellipse cx="35" cy="30" rx="8" ry="5" fill="rgba(255,255,255,.2)" transform="rotate(-30 35 30)"/>
+        </svg>
+      </div>
+    </div>
+    <h1>MATCH<br>COUNTDOWN</h1>
+    <div class="hero-sub">28 Mar – 24 May 2026 · 70 Matches · 13 Venues</div>
+    <div class="day-counter" id="dayCounter">Loading...</div>
+  </div>
+
+  <!-- TEAM FILTER -->
+  <div class="team-filter" id="teamFilter">
+    <div class="tc tc-all active" data-team="all">🏏 All Teams</div>
+  </div>
+
+  <!-- STATUS FILTER -->
+  <div class="status-filter">
+    <button class="sf active" data-sf="all">All</button>
+    <button class="sf" data-sf="upcoming">Upcoming</button>
+    <button class="sf" data-sf="live">🔴 Live</button>
+    <button class="sf" data-sf="past">Done</button>
+  </div>
+
+  <!-- NEXT MATCH -->
+  <div class="next-wrap" id="nextWrap"></div>
+
+  <!-- SCHEDULE LIST -->
+  <div class="sched">
+    <div class="sched-title">Full Schedule</div>
+    <div id="schedList"></div>
+  </div>
+</div>
+
+<!-- ══ PAGE: POINTS ══ -->
+<div class="page" id="page-points">
+  <div class="pts-wrap">
+    <div class="pts-title">Points Table</div>
+    <div class="pts-note">Updated live as matches complete. Top 4 teams qualify for playoffs.</div>
+    <table class="pts-table" id="ptsTable">
+      <thead>
+        <tr>
+          <th>#</th><th>Team</th><th>P</th><th>W</th><th>L</th>
+          <th>NR</th><th>Pts</th><th>NRR</th><th>Form</th>
+        </tr>
+      </thead>
+      <tbody id="ptsTbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ PAGE: VENUES ══ -->
+<div class="page" id="page-venues">
+  <div class="venues-wrap">
+    <div class="venues-title">🏟️ Venues 2026</div>
+    <div class="venues-grid" id="venuesGrid"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+<!-- SCROLL TOP -->
+<button class="scroll-top" id="scrollTop">↑</button>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const TEAMS = {
+  RCB:  {name:'Royal Challengers Bengaluru', c:'#CC0000', bg:'#1a0000'},
+  SRH:  {name:'Sunrisers Hyderabad',         c:'#F26522', bg:'#1e0800'},
+  MI:   {name:'Mumbai Indians',              c:'#005DA0', bg:'#00152b'},
+  KKR:  {name:'Kolkata Knight Riders',       c:'#8B2FC9', bg:'#110020'},
+  RR:   {name:'Rajasthan Royals',            c:'#254AA5', bg:'#060e20'},
+  CSK:  {name:'Chennai Super Kings',         c:'#F5D020', bg:'#1a1400'},
+  PBKS: {name:'Punjab Kings',               c:'#AA2029', bg:'#1a0004'},
+  GT:   {name:'Gujarat Titans',             c:'#1C8EAA', bg:'#001520'},
+  LSG:  {name:'Lucknow Super Giants',       c:'#A4D65E', bg:'#0d1a02'},
+  DC:   {name:'Delhi Capitals',             c:'#0078BC', bg:'#001a2e'},
+};
+
+function ist(d,t){
+  const[y,mo,dd]=d.split('-').map(Number),[h,m]=t.split(':').map(Number);
+  return Date.UTC(y,mo-1,dd,h-5,m-30);
+}
+
+const MATCHES=[
+  {id:1, t1:'RCB', t2:'SRH', v:'M. Chinnaswamy Stadium, Bengaluru',                        ms:ist('2026-03-28','19:30')},
+  {id:2, t1:'MI',  t2:'KKR', v:'Wankhede Stadium, Mumbai',                                  ms:ist('2026-03-29','19:30')},
+  {id:3, t1:'RR',  t2:'CSK', v:'Barsapara Cricket Stadium, Guwahati',                       ms:ist('2026-03-30','19:30')},
+  {id:4, t1:'PBKS',t2:'GT',  v:'Maharaja Yadavindra Singh Stadium, Mullanpur',               ms:ist('2026-03-31','19:30')},
+  {id:5, t1:'LSG', t2:'DC',  v:'BRSABV Ekana Cricket Stadium, Lucknow',                     ms:ist('2026-04-01','19:30')},
+  {id:6, t1:'KKR', t2:'SRH', v:'Eden Gardens, Kolkata',                                     ms:ist('2026-04-02','19:30')},
+  {id:7, t1:'CSK', t2:'PBKS',v:'MA Chidambaram Stadium, Chennai',                           ms:ist('2026-04-03','19:30')},
+  {id:8, t1:'DC',  t2:'MI',  v:'Arun Jaitley Stadium, Delhi',                               ms:ist('2026-04-04','15:30')},
+  {id:9, t1:'GT',  t2:'RR',  v:'Narendra Modi Stadium, Ahmedabad',                          ms:ist('2026-04-04','19:30')},
+  {id:10,t1:'SRH', t2:'LSG', v:'Rajiv Gandhi International Stadium, Hyderabad',             ms:ist('2026-04-05','15:30')},
+  {id:11,t1:'RCB', t2:'CSK', v:'M. Chinnaswamy Stadium, Bengaluru',                         ms:ist('2026-04-05','19:30')},
+  {id:12,t1:'KKR', t2:'PBKS',v:'Eden Gardens, Kolkata',                                     ms:ist('2026-04-06','19:30')},
+  {id:13,t1:'RR',  t2:'MI',  v:'Barsapara Cricket Stadium, Guwahati',                       ms:ist('2026-04-07','19:30')},
+  {id:14,t1:'DC',  t2:'GT',  v:'Arun Jaitley Stadium, Delhi',                               ms:ist('2026-04-08','19:30')},
+  {id:15,t1:'KKR', t2:'LSG', v:'Eden Gardens, Kolkata',                                     ms:ist('2026-04-09','19:30')},
+  {id:16,t1:'RR',  t2:'RCB', v:'Barsapara Cricket Stadium, Guwahati',                       ms:ist('2026-04-10','19:30')},
+  {id:17,t1:'PBKS',t2:'SRH', v:'Maharaja Yadavindra Singh Stadium, Mullanpur',               ms:ist('2026-04-11','15:30')},
+  {id:18,t1:'CSK', t2:'DC',  v:'MA Chidambaram Stadium, Chennai',                           ms:ist('2026-04-11','19:30')},
+  {id:19,t1:'LSG', t2:'GT',  v:'Ekana Stadium, Lucknow',                                    ms:ist('2026-04-12','15:30')},
+  {id:20,t1:'MI',  t2:'RCB', v:'Wankhede Stadium, Mumbai',                                  ms:ist('2026-04-12','19:30')},
+  {id:21,t1:'SRH', t2:'RR',  v:'Rajiv Gandhi Stadium, Hyderabad',                           ms:ist('2026-04-13','19:30')},
+  {id:22,t1:'CSK', t2:'KKR', v:'MA Chidambaram Stadium, Chennai',                           ms:ist('2026-04-14','19:30')},
+  {id:23,t1:'RCB', t2:'LSG', v:'M. Chinnaswamy Stadium, Bengaluru',                         ms:ist('2026-04-15','19:30')},
+  {id:24,t1:'MI',  t2:'PBKS',v:'Wankhede Stadium, Mumbai',                                  ms:ist('2026-04-16','19:30')},
+  {id:25,t1:'GT',  t2:'KKR', v:'Narendra Modi Stadium, Ahmedabad',                          ms:ist('2026-04-17','19:30')},
+  {id:26,t1:'RCB', t2:'DC',  v:'M. Chinnaswamy Stadium, Bengaluru',                         ms:ist('2026-04-18','15:30')},
+  {id:27,t1:'SRH', t2:'CSK', v:'Rajiv Gandhi Stadium, Hyderabad',                           ms:ist('2026-04-18','19:30')},
+  {id:28,t1:'KKR', t2:'RR',  v:'Eden Gardens, Kolkata',                                     ms:ist('2026-04-19','15:30')},
+  {id:29,t1:'PBKS',t2:'LSG', v:'Mullanpur Stadium, Punjab',                                 ms:ist('2026-04-19','19:30')},
+  {id:30,t1:'GT',  t2:'MI',  v:'Narendra Modi Stadium, Ahmedabad',                          ms:ist('2026-04-20','19:30')},
+  {id:31,t1:'SRH', t2:'DC',  v:'Rajiv Gandhi Stadium, Hyderabad',                           ms:ist('2026-04-21','19:30')},
+  {id:32,t1:'LSG', t2:'RR',  v:'Ekana Stadium, Lucknow',                                    ms:ist('2026-04-22','19:30')},
+  {id:33,t1:'MI',  t2:'CSK', v:'Wankhede Stadium, Mumbai',                                  ms:ist('2026-04-23','19:30')},
+  {id:34,t1:'RCB', t2:'GT',  v:'M. Chinnaswamy Stadium, Bengaluru',                         ms:ist('2026-04-24','19:30')},
+  {id:35,t1:'DC',  t2:'PBKS',v:'Arun Jaitley Stadium, Delhi',                               ms:ist('2026-04-25','15:30')},
+  {id:36,t1:'RR',  t2:'SRH', v:'Sawai Mansingh Stadium, Jaipur',                            ms:ist('2026-04-25','19:30')},
+  {id:37,t1:'GT',  t2:'CSK', v:'Narendra Modi Stadium, Ahmedabad',                          ms:ist('2026-04-26','15:30')},
+  {id:38,t1:'LSG', t2:'KKR', v:'Ekana Stadium, Lucknow',                                    ms:ist('2026-04-26','19:30')},
+  {id:39,t1:'DC',  t2:'RCB', v:'Arun Jaitley Stadium, Delhi',                               ms:ist('2026-04-27','19:30')},
+  {id:40,t1:'PBKS',t2:'RR',  v:'Mullanpur Stadium, Punjab',                                 ms:ist('2026-04-28','19:30')},
+  {id:41,t1:'MI',  t2:'SRH', v:'Wankhede Stadium, Mumbai',                                  ms:ist('2026-04-29','19:30')},
+  {id:42,t1:'GT',  t2:'RCB', v:'Narendra Modi Stadium, Ahmedabad',                          ms:ist('2026-04-30','19:30')},
+  {id:43,t1:'RR',  t2:'DC',  v:'Sawai Mansingh Stadium, Jaipur',                            ms:ist('2026-05-01','19:30')},
+  {id:44,t1:'CSK', t2:'MI',  v:'MA Chidambaram Stadium, Chennai',                           ms:ist('2026-05-02','19:30')},
+  {id:45,t1:'SRH', t2:'KKR', v:'Rajiv Gandhi Stadium, Hyderabad',                           ms:ist('2026-05-03','15:30')},
+  {id:46,t1:'GT',  t2:'PBKS',v:'Narendra Modi Stadium, Ahmedabad',                          ms:ist('2026-05-03','19:30')},
+  {id:47,t1:'MI',  t2:'LSG', v:'Wankhede Stadium, Mumbai',                                  ms:ist('2026-05-04','19:30')},
+  {id:48,t1:'DC',  t2:'CSK', v:'Arun Jaitley Stadium, Delhi',                               ms:ist('2026-05-05','19:30')},
+  {id:49,t1:'SRH', t2:'PBKS',v:'Rajiv Gandhi Stadium, Hyderabad',                           ms:ist('2026-05-06','19:30')},
+  {id:50,t1:'LSG', t2:'RCB', v:'Ekana Stadium, Lucknow',                                    ms:ist('2026-05-07','19:30')},
+  {id:51,t1:'DC',  t2:'KKR', v:'Arun Jaitley Stadium, Delhi',                               ms:ist('2026-05-08','19:30')},
+  {id:52,t1:'RR',  t2:'GT',  v:'Sawai Mansingh Stadium, Jaipur',                            ms:ist('2026-05-09','19:30')},
+  {id:53,t1:'CSK', t2:'LSG', v:'MA Chidambaram Stadium, Chennai',                           ms:ist('2026-05-10','15:30')},
+  {id:54,t1:'RCB', t2:'MI',  v:'M. Chinnaswamy Stadium, Bengaluru',                         ms:ist('2026-05-10','19:30')},
+  {id:55,t1:'PBKS',t2:'DC',  v:'Mullanpur Stadium, Punjab',                                 ms:ist('2026-05-11','19:30')},
+  {id:56,t1:'GT',  t2:'SRH', v:'Narendra Modi Stadium, Ahmedabad',                          ms:ist('2026-05-12','19:30')},
+  {id:57,t1:'RCB', t2:'KKR', v:'M. Chinnaswamy Stadium, Bengaluru',                         ms:ist('2026-05-13','19:30')},
+  {id:58,t1:'PBKS',t2:'MI',  v:'Mullanpur Stadium, Punjab',                                 ms:ist('2026-05-14','19:30')},
+  {id:59,t1:'LSG', t2:'CSK', v:'Ekana Stadium, Lucknow',                                    ms:ist('2026-05-15','19:30')},
+  {id:60,t1:'KKR', t2:'GT',  v:'Eden Gardens, Kolkata',                                     ms:ist('2026-05-16','19:30')},
+  {id:61,t1:'PBKS',t2:'RCB', v:'Mullanpur Stadium, Punjab',                                 ms:ist('2026-05-17','15:30')},
+  {id:62,t1:'DC',  t2:'RR',  v:'Arun Jaitley Stadium, Delhi',                               ms:ist('2026-05-17','19:30')},
+  {id:63,t1:'CSK', t2:'SRH', v:'MA Chidambaram Stadium, Chennai',                           ms:ist('2026-05-18','19:30')},
+  {id:64,t1:'RR',  t2:'LSG', v:'Sawai Mansingh Stadium, Jaipur',                            ms:ist('2026-05-19','19:30')},
+  {id:65,t1:'KKR', t2:'MI',  v:'Eden Gardens, Kolkata',                                     ms:ist('2026-05-20','19:30')},
+  {id:66,t1:'CSK', t2:'GT',  v:'MA Chidambaram Stadium, Chennai',                           ms:ist('2026-05-21','19:30')},
+  {id:67,t1:'SRH', t2:'RCB', v:'Rajiv Gandhi Stadium, Hyderabad',                           ms:ist('2026-05-22','19:30')},
+  {id:68,t1:'LSG', t2:'PBKS',v:'Ekana Stadium, Lucknow',                                    ms:ist('2026-05-23','19:30')},
+  {id:69,t1:'MI',  t2:'RR',  v:'Wankhede Stadium, Mumbai',                                  ms:ist('2026-05-24','15:30')},
+  {id:70,t1:'KKR', t2:'DC',  v:'Eden Gardens, Kolkata',                                     ms:ist('2026-05-24','19:30')},
+  // PLAYOFFS
+  {id:71,playoff:'Qualifier 1', v:'TBA', ms:ist('2026-05-27','19:30')},
+  {id:72,playoff:'Eliminator',  v:'TBA', ms:ist('2026-05-28','19:30')},
+  {id:73,playoff:'Qualifier 2', v:'TBA', ms:ist('2026-05-30','19:30')},
+  {id:74,playoff:'🏆 FINAL',    v:'TBA', ms:ist('2026-05-31','19:30')},
+];
+
+const VENUES = [
+  {name:'M. Chinnaswamy Stadium',city:'Bengaluru',cap:'35,000',icon:'🏟️',
+   fact:'Home of RCB. Known for small boundaries & big scores.'},
+  {name:'Wankhede Stadium',city:'Mumbai',cap:'33,108',icon:'🌊',
+   fact:'Home of MI. Sea breeze & electric atmosphere.'},
+  {name:'Eden Gardens',city:'Kolkata',cap:'66,349',icon:'👑',
+   fact:'Largest cricket stadium in India. Home of KKR.'},
+  {name:'Narendra Modi Stadium',city:'Ahmedabad',cap:'1,32,000',icon:'🌟',
+   fact:"World's largest cricket stadium. GT's fortress."},
+  {name:'MA Chidambaram Stadium',city:'Chennai',cap:'38,000',icon:'🌡️',
+   fact:'Home of CSK. Notoriously hot & spin-friendly.'},
+  {name:'Arun Jaitley Stadium',city:'Delhi',cap:'41,820',icon:'🏛️',
+   fact:'Home of DC. Located in the heart of the capital.'},
+  {name:'Rajiv Gandhi Intl. Stadium',city:'Hyderabad',cap:'55,000',icon:'☀️',
+   fact:'Home of SRH. Known for pace-friendly surface.'},
+  {name:'Sawai Mansingh Stadium',city:'Jaipur',cap:'30,000',icon:'🏰',
+   fact:'Home of RR. The Pink City fortress.'},
+  {name:'Barsapara Cricket Stadium',city:'Guwahati',cap:'40,000',icon:'🌿',
+   fact:'Northeast India\'s premier venue. Lush surroundings.'},
+  {name:'BRSABV Ekana Stadium',city:'Lucknow',cap:'50,000',icon:'🕌',
+   fact:'Home of LSG. Modern stadium in the City of Nawabs.'},
+  {name:'M.Y.S. Stadium, Mullanpur',city:'New Chandigarh',cap:'35,000',icon:'🆕',
+   fact:'Home of PBKS. Newest venue in IPL 2026.'},
+  {name:'Sawai Mansingh Stadium',city:'Jaipur',cap:'30,000',icon:'🏰',
+   fact:'RR home. One of IPL\'s most iconic venues.'},
+  {name:'M. Chinnaswamy Stadium',city:'Bengaluru',cap:'35,000',icon:'🏟️',
+   fact:'High-scoring venue with passionate crowd.'},
+];
+
+// Deduplicate venues
+const UNIQUE_VENUES = [];
+const vSeen = new Set();
+VENUES.forEach(v => {
+  const k = v.name+v.city;
+  if(!vSeen.has(k)){vSeen.add(k);UNIQUE_VENUES.push(v);}
+});
+
+// Count matches per venue
+MATCHES.forEach(m => {
+  if(m.playoff) return;
+  UNIQUE_VENUES.forEach(uv => {
+    if(m.v.includes(uv.name.split(',')[0]) || m.v.includes(uv.city)){
+      uv.matchCount = (uv.matchCount||0)+1;
+    }
+  });
+});
+
+// ═══════════════════════════════════════
+// POINTS TABLE DATA (starts blank, updates live)
+// ═══════════════════════════════════════
+const PTS = {};
+Object.keys(TEAMS).forEach(k => {
+  PTS[k] = {p:0,w:0,l:0,nr:0,pts:0,nrr:0,form:[]};
+});
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+const IST = 5.5*3600000, LW = 3.5*3600000;
+const DAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+const MOS  = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MOFULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SEASON_START = ist('2026-03-28','19:30');
+const SEASON_END   = ist('2026-05-24','19:30');
+const TOTAL_DAYS   = Math.ceil((SEASON_END - SEASON_START)/86400000);
+
+function matchStatus(m){
+  const n=Date.now(),e=m.ms+LW;
+  if(n>=m.ms&&n<=e) return 'live';
+  if(n>e) return 'past';
+  return 'upcoming';
+}
+function istDate(ms){
+  const d=new Date(ms+IST);
+  return{n:d.getUTCDate(),day:DAYS[d.getUTCDay()],mo:MOS[d.getUTCMonth()],
+    moF:MOFULL[d.getUTCMonth()],yr:d.getUTCFullYear()};
+}
+function fmtTime(ms){
+  const d=new Date(ms+IST),h=d.getUTCHours(),m=d.getUTCMinutes();
+  const ap=h>=12?'PM':'AM',hh=h%12||12;
+  return`${hh}:${String(m).padStart(2,'0')} ${ap} IST`;
+}
+function cdParts(rem){
+  if(rem<=0) return null;
+  const s=Math.floor(rem/1000);
+  return{d:Math.floor(s/86400),h:Math.floor((s%86400)/3600),m:Math.floor((s%3600)/60),s:s%60};
+}
+function pad(n){return String(n).padStart(2,'0');}
+function tlogoHTML(code,size=44){
+  const t=TEAMS[code]||{c:'#888',bg:'#111'};
+  return`<div class="tlogo" style="width:${size}px;height:${size}px;background:${t.bg};color:${t.c};font-size:${size*.22}rem">${code}</div>`;
+}
+
+// ═══════════════════════════════════════
+// DAY COUNTER
+// ═══════════════════════════════════════
+function updateDayCounter(){
+  const now = Date.now();
+  const el = document.getElementById('dayCounter');
+  if(now < SEASON_START){
+    const d = cdParts(SEASON_START - now);
+    el.innerHTML = `Season starts in <span>${d.d}d ${pad(d.h)}h ${pad(d.m)}m</span>`;
+  } else if(now > SEASON_END + LW){
+    el.innerHTML = `Season completed 🏆`;
+  } else {
+    const dayNum = Math.ceil((now - SEASON_START)/86400000);
+    el.innerHTML = `Day <span>${dayNum}</span> of ${TOTAL_DAYS}`;
+  }
+}
+
+// ═══════════════════════════════════════
+// TEAM FILTER CHIPS
+// ═══════════════════════════════════════
+function buildTeamFilter(){
+  const wrap = document.getElementById('teamFilter');
+  wrap.innerHTML = `<div class="tc tc-all active" data-team="all">🏏 All Teams</div>`;
+  Object.keys(TEAMS).forEach(code => {
+    const t = TEAMS[code];
+    const div = document.createElement('div');
+    div.className = 'tc';
+    div.dataset.team = code;
+    div.innerHTML = `<span class="tc-dot" style="background:${t.c}"></span>${code}`;
+    wrap.appendChild(div);
+  });
+  wrap.addEventListener('click', e => {
+    const chip = e.target.closest('.tc');
+    if(!chip) return;
+    wrap.querySelectorAll('.tc').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    const t = chip.dataset.team;
+    activeTeam = t;
+    // style active chip
+    if(t !== 'all'){
+      const tc = TEAMS[t];
+      chip.style.background = tc.c;
+      chip.style.borderColor = tc.c;
+      chip.style.color = '#000';
+    } else {
+      chip.style.background='';chip.style.borderColor='';chip.style.color='';
+    }
+    renderSched();
+  });
+}
+
+// ═══════════════════════════════════════
+// NEXT MATCH
+// ═══════════════════════════════════════
+function renderNext(){
+  const up = MATCHES.filter(m=>!m.playoff && matchStatus(m)==='upcoming');
+  const wrap = document.getElementById('nextWrap');
+  if(!up.length){wrap.innerHTML='';return;}
+  const m = up[0], dt = istDate(m.ms), t1=TEAMS[m.t1]||{}, t2=TEAMS[m.t2]||{};
+  wrap.innerHTML = `
+  <div class="next-card">
+    <div class="nc-label">NEXT MATCH · M${m.id}</div>
+    <div class="nc-glow"></div><div class="nc-glow2"></div>
+    <div class="match-teams">
+      <div class="tblock">
+        ${tlogoHTML(m.t1, 66)}
+        <div class="tname-big" style="color:${t1.c||'#fff'}">${m.t1}</div>
+      </div>
+      <div class="vs-text">VS</div>
+      <div class="tblock">
+        ${tlogoHTML(m.t2, 66)}
+        <div class="tname-big" style="color:${t2.c||'#fff'}">${m.t2}</div>
+      </div>
+    </div>
+    <div class="next-meta">
+      📅 <strong>${dt.day}, ${dt.n} ${dt.moF} ${dt.yr}</strong> &nbsp;·&nbsp; <strong>${fmtTime(m.ms)}</strong><br>
+      📍 ${m.v}
+    </div>
+    <div class="cd-row" id="heroCD"></div>
+    <div class="nc-actions">
+      <button class="nc-btn" onclick="addToCalendar(${m.id})">📅 Add to Calendar</button>
+      <button class="nc-btn" onclick="shareMatch(${m.id})">📤 Share</button>
+      <button class="nc-btn" onclick="shareWhatsApp(${m.id})">💬 WhatsApp</button>
+    </div>
+  </div>`;
+  updateHeroCD(m);
+}
+
+function updateHeroCD(m){
+  const el = document.getElementById('heroCD'); if(!el) return;
+  const c = cdParts(m.ms - Date.now());
+  if(!c){
+    el.innerHTML=`<div style="color:var(--live);font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;animation:lp 1.4s ease infinite">🔴 MATCH IN PROGRESS</div>`;
+    return;
+  }
+  const blocks = [
+    c.d>0?`<div class="cdb"><div class="cdn" id="cdD">${c.d}</div><div class="cdl">Days</div></div>`:'',
+    `<div class="cdb"><div class="cdn" id="cdH">${pad(c.h)}</div><div class="cdl">Hrs</div></div>`,
+    `<div class="cdb"><div class="cdn" id="cdM">${pad(c.m)}</div><div class="cdl">Min</div></div>`,
+    `<div class="cdb"><div class="cdn" id="cdS">${pad(c.s)}</div><div class="cdl">Sec</div></div>`,
+  ].join('');
+  el.innerHTML = blocks;
+}
+
+// ═══════════════════════════════════════
+// SCHEDULE
+// ═══════════════════════════════════════
+let activeTeam = 'all', activeSF = 'all';
+
+function renderSched(){
+  const grps = {};
+  MATCHES.forEach(m => {
+    const st = matchStatus(m);
+    if(activeSF !== 'all' && st !== activeSF) return;
+    if(activeTeam !== 'all' && !m.playoff && m.t1 !== activeTeam && m.t2 !== activeTeam) return;
+    const dt = istDate(m.ms), k = `${dt.yr}-${dt.mo}`;
+    if(!grps[k]) grps[k] = {lbl:`${dt.moF} ${dt.yr}`, items:[]};
+    grps[k].items.push(m);
+  });
+  const container = document.getElementById('schedList');
+  const keys = Object.keys(grps).sort();
+  if(!keys.length){
+    container.innerHTML='<div class="empty">No matches found for this filter.</div>';
+    return;
+  }
+  container.innerHTML = keys.map(k => {
+    const g = grps[k];
+    return `<div class="month-g">
+      <div class="month-lbl">${g.lbl}</div>
+      ${g.items.map(m => matchCard(m)).join('')}
+    </div>`;
+  }).join('');
+}
+
+function matchCard(m){
+  const st = matchStatus(m), dt = istDate(m.ms), rem = m.ms - Date.now(), c = cdParts(rem);
+
+  let right = '';
+  if(st==='live'){
+    right=`<div class="mc-right"><span class="b-live">🔴 LIVE</span></div>`;
+  } else if(st==='past'){
+    right=`<div class="mc-right"><span class="b-done">✓ Done</span></div>`;
+  } else if(c){
+    let s = c.d>0?`${c.d}d ${c.h}h`:c.h>0?`${c.h}h ${pad(c.m)}m`:`${pad(c.m)}m ${pad(c.s)}s`;
+    right=`<div class="mc-right">
+      <div class="cdm" data-id="${m.id}">${s}</div>
+      <div class="cdml">to start</div>
+      <div class="mc-actions">
+        <button class="mab" title="Add to Calendar" onclick="addToCalendar(${m.id})">📅</button>
+        <button class="mab" title="Share on WhatsApp" onclick="shareWhatsApp(${m.id})">💬</button>
+        <button class="mab" title="Copy link" onclick="shareMatch(${m.id})">🔗</button>
+      </div>
+    </div>`;
+  }
+
+  let teamsHTML = '';
+  if(m.playoff){
+    teamsHTML = `<div class="mc-teams" style="color:var(--gold)">${m.playoff}</div>`;
+  } else {
+    const c1=TEAMS[m.t1]?.c||'#aaa', c2=TEAMS[m.t2]?.c||'#aaa';
+    teamsHTML = `<div class="mc-teams">
+      <span><span class="tdot" style="background:${c1}"></span>${m.t1}</span>
+      <span class="mc-vs">vs</span>
+      <span><span class="tdot" style="background:${c2}"></span>${m.t2}</span>
+    </div>`;
+  }
+
+  return `<div class="mc ${st==='live'?'is-live':''} ${st==='past'?'is-past':''}" id="mc-${m.id}">
+    <div class="mc-date">
+      <div class="mc-day-n">${dt.n}</div>
+      <div class="mc-day-s">${dt.day} ${dt.mo}</div>
+      <div class="mc-time">${fmtTime(m.ms)}</div>
+    </div>
+    <div class="mc-info">
+      ${teamsHTML}
+      <div class="mc-venue">📍 ${m.v}</div>
+      <div class="mc-num">Match ${m.id} of 70</div>
+    </div>
+    ${right}
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// POINTS TABLE
+// ═══════════════════════════════════════
+function renderPoints(){
+  const rows = Object.keys(PTS).map(k=>({...PTS[k],code:k}))
+    .sort((a,b)=>b.pts-a.pts||(b.nrr-a.nrr));
+  const tbody = document.getElementById('ptsTbody');
+  tbody.innerHTML = rows.map((r,i) => {
+    const t = TEAMS[r.code];
+    const formHTML = (r.form||[]).slice(-5).map(f=>
+      `<span style="color:${f==='W'?'#06D6A0':f==='L'?'#FF3B5C':'#888'};font-weight:700;font-size:.7rem">${f}</span>`
+    ).join(' ');
+    const isPlayoff = i < 4;
+    return `<tr class="${isPlayoff?'playoff-zone':''}">
+      <td><strong>${i+1}</strong></td>
+      <td><div class="team-cell">
+        <div class="tc-logo" style="background:${t.bg};color:${t.c}">${r.code}</div>
+        <div><div class="team-full">${t.name.split(' ').slice(-2).join(' ')}</div>
+        <div class="team-abbr">${r.code}</div></div>
+      </div></td>
+      <td>${r.p}</td><td>${r.w}</td><td>${r.l}</td><td>${r.nr}</td>
+      <td><span class="pts-badge">${r.pts}</span></td>
+      <td style="color:${r.nrr>=0?'#06D6A0':'#FF3B5C'}">${r.nrr>0?'+':''}${r.nrr.toFixed(3)}</td>
+      <td>${formHTML||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// VENUES
+// ═══════════════════════════════════════
+function renderVenues(){
+  const grid = document.getElementById('venuesGrid');
+  grid.innerHTML = UNIQUE_VENUES.map(v=>`
+    <div class="vc">
+      <div class="vc-icon">${v.icon}</div>
+      <div class="vc-name">${v.name}</div>
+      <div class="vc-city">${v.city}</div>
+      <div class="vc-cap">Capacity: ${v.cap}</div>
+      <div class="vc-cap" style="margin-top:.3rem;color:var(--sub)">${v.fact}</div>
+      ${v.matchCount?`<div class="vc-matches">🏏 ${v.matchCount} matches this season</div>`:''}
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+// SHARE / CALENDAR
+// ═══════════════════════════════════════
+function getMatchText(id){
+  const m = MATCHES.find(x=>x.id===id); if(!m) return '';
+  const dt = istDate(m.ms);
+  return m.playoff
+    ? `${m.playoff} — IPL 2026 | ${dt.n} ${dt.moF} | ${fmtTime(m.ms)} | ${m.v}`
+    : `${m.t1} vs ${m.t2} — IPL 2026 | ${dt.n} ${dt.moF} | ${fmtTime(m.ms)} | ${m.v}`;
+}
+
+function addToCalendar(id){
+  const m = MATCHES.find(x=>x.id===id); if(!m) return;
+  const dt = istDate(m.ms);
+  const d = new Date(m.ms);
+  const fmt = d2 => d2.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  const end = new Date(m.ms + LW);
+  const title = m.playoff ? m.playoff+' - IPL 2026' : `${m.t1} vs ${m.t2} - IPL 2026`;
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE`+
+    `&text=${encodeURIComponent(title)}`+
+    `&dates=${fmt(d)}/${fmt(end)}`+
+    `&details=${encodeURIComponent('IPL 2026 Match | '+m.v)}`+
+    `&location=${encodeURIComponent(m.v)}`;
+  window.open(url,'_blank');
+  showToast('Opening Google Calendar 📅');
+}
+
+function shareWhatsApp(id){
+  const text = getMatchText(id);
+  const url = `https://wa.me/?text=${encodeURIComponent('🏏 IPL 2026\n'+text+'\n\nhttps://vrd-coder.github.io/ipl2026')}`;
+  window.open(url,'_blank');
+}
+
+function shareMatch(id){
+  const text = getMatchText(id);
+  if(navigator.clipboard){
+    navigator.clipboard.writeText('🏏 '+text+'\nhttps://vrd-coder.github.io/ipl2026');
+    showToast('Copied to clipboard 🔗');
+  }
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════
+let confettiActive = false;
+function launchConfetti(){
+  if(confettiActive) return;
+  confettiActive = true;
+  const canvas = document.getElementById('confetti');
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const pieces = Array.from({length:120},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height-canvas.height,
+    r:Math.random()*6+3, d:Math.random()*120,
+    color:['#F5A623','#FFD166','#FF3B5C','#06D6A0','#4ECDC4','#fff'][Math.floor(Math.random()*6)],
+    tilt:Math.random()*10-10, tiltAngle:0, tiltAngleInc:Math.random()*.07+.05,
+  }));
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.tiltAngle+=p.tiltAngleInc; p.y+=Math.cos(p.d+frame/4)+1+p.r/2; p.x+=Math.sin(frame/6);
+      p.tilt=Math.sin(p.tiltAngle)*12;
+      ctx.beginPath(); ctx.lineWidth=p.r;
+      ctx.strokeStyle=p.color;
+      ctx.moveTo(p.x+p.tilt+p.r/3,p.y);
+      ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/5);
+      ctx.stroke();
+    });
+    frame++;
+    if(frame<180) requestAnimationFrame(draw);
+    else{canvas.style.display='none';confettiActive=false;}
+  }
+  draw();
+}
+
+// ═══════════════════════════════════════
+// TICK — every second
+// ═══════════════════════════════════════
+let prevLiveCount = 0;
+function tick(){
+  const now = Date.now();
+  updateDayCounter();
+
+  // Live pill
+  const liveMs = MATCHES.filter(m=>matchStatus(m)==='live');
+  const pill = document.getElementById('livePill');
+  pill.style.display = liveMs.length ? 'flex' : 'none';
+  document.getElementById('liveText').textContent = liveMs.length>1?`${liveMs.length} LIVE`:'LIVE';
+
+  // Confetti when match goes live
+  if(liveMs.length > prevLiveCount && prevLiveCount >= 0){ launchConfetti(); showToast('🔴 Match is LIVE! 🏏🎉'); }
+  prevLiveCount = liveMs.length;
+
+  // Hero countdown
+  const up = MATCHES.filter(m=>!m.playoff && matchStatus(m)==='upcoming');
+  if(up.length){
+    const c = cdParts(up[0].ms - now);
+    if(c){
+      const dE=document.getElementById('cdD'),hE=document.getElementById('cdH'),
+            mE=document.getElementById('cdM'),sE=document.getElementById('cdS');
+      if(dE)dE.textContent=c.d; if(hE)hE.textContent=pad(c.h);
+      if(mE)mE.textContent=pad(c.m); if(sE)sE.textContent=pad(c.s);
+    }
+  }
+
+  // Mini countdowns
+  document.querySelectorAll('[data-id]').forEach(el=>{
+    const m=MATCHES.find(x=>x.id===+el.dataset.id); if(!m) return;
+    const c=cdParts(m.ms-now); if(!c) return;
+    el.textContent = c.d>0?`${c.d}d ${c.h}h`:c.h>0?`${c.h}h ${pad(c.m)}m`:`${pad(c.m)}m ${pad(c.s)}s`;
+  });
+}
+
+// ═══════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════
+document.querySelectorAll('.ntab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-'+btn.dataset.page).classList.add('active');
+  });
+});
+
+// STATUS FILTER
+document.querySelectorAll('.sf').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.sf').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeSF = btn.dataset.sf;
+    renderSched();
+  });
+});
+
+// THEME
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.addEventListener('click',()=>{
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme', isDark?'light':'dark');
+  themeBtn.textContent = isDark ? '☀️' : '🌙';
+  showToast(isDark ? '☀️ Light mode' : '🌙 Dark mode');
+});
+
+// SCROLL TOP
+const scrollTopBtn = document.getElementById('scrollTop');
+window.addEventListener('scroll',()=>{
+  scrollTopBtn.classList.toggle('show', window.scrollY > 400);
+});
+scrollTopBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+// SMOOTH SCROLL TO NEXT MATCH
+function scrollToNext(){
+  const up = MATCHES.filter(m=>!m.playoff && matchStatus(m)==='upcoming');
+  if(!up.length) return;
+  setTimeout(()=>{
+    const el = document.getElementById('mc-'+up[0].id);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  }, 800);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+buildTeamFilter();
+renderNext();
+renderSched();
+renderPoints();
+renderVenues();
+tick();
+setInterval(tick, 1000);
+scrollToNext();
+</script>
+</body>
+</html>
